@@ -1,7 +1,92 @@
-
+import { useState } from 'react'
+import StatCard from './StatCard.jsx'
 import './App.css'
 
-function App() {
+const initialTasks = [
+  {
+    id: 1,
+    title: 'Complete DSA assignment',
+    subject: 'Data Structures',
+    priority: 'High',
+    completed: false,
+  },
+  {
+    id: 2,
+    title: 'Revise React components',
+    subject: 'Web Development',
+    priority: 'Medium',
+    completed: true,
+  },
+  {
+    id: 3,
+    title: 'Practice Java problems',
+    subject: 'Programming',
+    priority: 'High',
+    completed: false,
+  },
+  {
+    id: 4,
+    title: 'Review lecture notes',
+    subject: 'Computer Science',
+    priority: 'Low',
+    completed: false,
+  },
+  {
+    id: 5,
+    title : 'Practice React Components',
+    subject : 'Web Development',
+    priority: 'High',
+    completed : false,
+  },
+  {
+    id: 6,
+    title : 'Review Lecture Notes',
+    subject : 'COA',
+    priority: 'Medium',
+    completed : false,
+  },
+  {
+    id: 7,
+    title : 'Study For 30 mins',
+    subject : 'Any',
+    priority: 'High',
+    completed : false,
+  },
+]
+function App() {  
+const [tasks, setTasks] = useState(initialTasks)
+const [newTitle, setNewTitle] = useState('')
+const [newSubject, setNewSubject] = useState('')
+const [newPriority, setNewPriority] = useState('Medium')
+const [filter, setFilter] = useState('All')
+
+function toggleTask(id) {
+  setTasks((currentTasks) =>
+    currentTasks.map((task) =>
+      task.id === id
+        ? { ...task, completed: !task.completed }
+        : task
+    )
+  )
+}
+
+const completedCount = tasks.filter(
+  (task) => task.completed
+).length
+
+const remainingCount = tasks.length - completedCount
+
+const progress =
+  tasks.length === 0
+    ? 0
+    : Math.round((completedCount / tasks.length) * 100)
+
+const visibleTasks = tasks.filter((task) => {
+  if (filter === 'Pending') return !task.completed
+  if (filter === 'Completed') return task.completed
+  return true
+})
+    
   return (
     <div className="app">
       <aside className="sidebar">
@@ -38,28 +123,28 @@ function App() {
 
         <section className="welcome">
           <p className="eyebrow">YOUR PRODUCTIVITY HUB</p>
-          <h1>Make today count, Deep.</h1>
+          <h1>{"Focus" + "flow"}</h1>
           <p>Small steps every day lead to big results.</p>
         </section>
 
         <section className="stats">
-          <article className="stat-card">
-            <p>Total tasks</p>
-            <h2>8</h2>
-            <span>Across all subjects</span>
-          </article>
+          <StatCard
+          title="Total tasks"
+          value={tasks.length}
+          description="Across all subjects"
+          />
 
-          <article className="stat-card">
-            <p>Completed</p>
-            <h2>3</h2>
-            <span>You're making progress</span>
-          </article>
+          <StatCard
+          title="Completed"
+          value={completedCount}
+          description="You're making progress"
+          />
 
-          <article className="stat-card">
-            <p>Remaining</p>
-            <h2>5</h2>
-            <span>One task at a time</span>
-          </article>
+          <StatCard
+            title="Remaining"
+            value={remainingCount}
+            description="One task at a time"
+          />
         </section>
 
         <section className="content-grid">
@@ -73,46 +158,34 @@ function App() {
                 + Add task
               </button>
             </div>
+              <div className="task-list">
+                {visibleTasks.map((task) => (
+                  <div className="task-row" key={task.id}>
+                    <button
+                      type="button"
+                      className={`task-check ${task.completed ? 'done' : ''}`}
+                      onClick={() => toggleTask(task.id)}
+                      aria-label={
+                        task.completed
+                          ? `Mark ${task.title} as incomplete`
+                          : `Mark ${task.title} as complete`
+                      }
+                    >
+                      {task.completed ? '✓' : ''}
+                    </button>
 
-            <div className="task-list">
-              <div className="task-row">
-                <span className="task-check done">✓</span>
-                <div className="task-info">
-                  <strong>Revise linked lists</strong>
-                  <span>Data Structures</span>
-                </div>
-                <span className="priority high">High</span>
-              </div>
+                    <div className="task-info">
+                      <strong>{task.title}</strong>
+                      <span>{task.subject}</span>
+                    </div>
 
-              <div className="task-row">
-                <span className="task-check"></span>
-                <div className="task-info">
-                  <strong>Practice React components</strong>
-                  <span>Web Development</span>
-                </div>
-                <span className="priority medium">Medium</span>
-              </div>
-
-              <div className="task-row">
-                <span className="task-check"></span>
-                <div className="task-info">
-                  <strong>Review lecture notes</strong>
-                  <span>Computer Architecture</span>
-                </div>
-                <span className="priority low">Low</span>
-              </div>
-
-              <div className="task-row">
-                <span className="task-check"></span>
-                <div className="task-info">
-                  <strong>Study for 30 minutes</strong>
-                  <span>Personal growth</span>
-                </div>
-                <span className="priority medium">Medium</span>
+                    <span className={`priority ${task.priority.toLowerCase()}`}>
+                      {task.priority}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-
           <aside className="panel progress-panel">
             <h2>Your progress</h2>
             <p>A little progress is still progress.</p>
